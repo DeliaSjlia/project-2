@@ -1,11 +1,15 @@
+import { useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import RegistrationModal from "./components/RegistrationModal";
 import "./index.css";
 
 export default function App() {
+  const [showRegistration, setShowRegistration] = useState(false);
+
   return (
     <>
-      <Header />
+      <Header onRegister={() => setShowRegistration(true)} />
 
       <main>
         <section>
@@ -73,6 +77,10 @@ export default function App() {
       </main>
 
       <Footer />
+
+      {showRegistration && (
+        <RegistrationModal onClose={() => setShowRegistration(false)} />
+      )}
     </>
   );
 }

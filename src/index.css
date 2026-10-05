@@ -301,3 +301,46 @@ main p {
     grid-template-columns: 1fr;
   }
 }
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.registration-modal {
+  position: relative;
+  width: min(100%, 420px);
+  padding: 32px;
+  background: var(--bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+.registration-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.registration-modal input {
+  padding: 12px;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
