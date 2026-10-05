@@ -47,12 +47,9 @@ export default function Header({ onRegister }) {
           Anmelden
         </button>
 
-        <button type="button" className="btn-primary">
+        <button type="button" className="btn-primary" onClick={onRegister} >
           Registrieren
         </button>
-        <button type="button">🌙</button>
-        <button type="button">Anmelden</button>
-        <button type="button">Registrieren</button>
       </nav>
     </header>
   );
