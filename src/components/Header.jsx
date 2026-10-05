@@ -1,4 +1,4 @@
-export default function Header() {
+export default function Header({ onRegister }) {
   return (
     <header>
       <h2>🐝 VocaBee</h2>
@@ -7,7 +7,7 @@ export default function Header() {
         <a href="#">Kurse</a>
         <button type="button">🌙</button>
         <button type="button">Anmelden</button>
-        <button type="button">Registrieren</button>
+        <button type="button" onClick={onRegister}>Registrieren</button>
       </nav>
     </header>
   );
