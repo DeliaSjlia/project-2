@@ -1,0 +1,33 @@
+.btn-text,
+.btn-primary,
+.btn-secondary {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+}
+
+.btn-text {
+  color: var(--c-text);
+  background: none;
+}
+
+.btn-text:hover {
+  color: var(--c-text-hover);
+}
+
+.btn-primary {
+  color: var(--c-primary-text);
+  background: var(--c-primary);
+}
+
+.btn-primary:hover {
+  background: var(--c-primary-hover);
+}
+
+.btn-secondary {
+  color: var(--c-secondary-text);
+  background: var(--c-secondary);
+}
+
+.btn-secondary:hover {
+  background: var(--c-secondary-hover);
+}

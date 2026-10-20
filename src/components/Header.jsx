@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import beeLogo from "../assets/bee.svg";
+import beeLogo from "../assets/images/bee.svg";
+import { registrationDialogId } from "../vars";
 
-export default function Header({ onRegister }) {
+export default function Header() {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
 
@@ -37,18 +38,19 @@ export default function Header({ onRegister }) {
           type="button"
           className="theme-toggle"
           onClick={toggleTheme}
-          aria-label="Dunkelmodus"
+          aria-label="Modus wechseln"
           aria-pressed={theme === "dark"}
         >
           <span aria-hidden="true">{theme === "light" ? "🌙" : "☀️"}</span>
         </button>
 
-        <button type="button" className="btn-text">
+        <button
+          type="button"
+          commandFor={registrationDialogId}
+          command="show-modal"
+          className="btn-primary"
+        >
           Anmelden
-        </button>
-
-        <button type="button" className="btn-primary" onClick={onRegister} >
-          Registrieren
         </button>
       </nav>
     </header>

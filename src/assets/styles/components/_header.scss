@@ -1,0 +1,25 @@
+header {
+  padding: 14px var(--page-padding);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--c-header);
+}
+
+header > div {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+  flex: 1;
+}
+
+header nav a:last-of-type {
+  margin-right: auto;
+}

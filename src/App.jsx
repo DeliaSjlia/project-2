@@ -1,16 +1,11 @@
-import { useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import RegistrationModal from "./components/RegistrationModal";
-import "./index.css";
+import LoginDialog from "./components/LoginDialog.jsx";
 
 export default function App() {
-  const [showRegistration, setShowRegistration] = useState(false);
-
   return (
     <>
-      <Header onRegister={() => setShowRegistration(true)} />
-
+      <Header />
       <main>
         <section>
           <h1>Sprich wie ein Einheimischer.</h1>
@@ -78,9 +73,7 @@ export default function App() {
 
       <Footer />
 
-      {showRegistration && (
-        <RegistrationModal onClose={() => setShowRegistration(false)} />
-      )}
+      <LoginDialog />
     </>
   );
 }
