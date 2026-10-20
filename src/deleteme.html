@@ -1,0 +1,265 @@
+generics
+::backdrop {
+  background-color: rgba(black, .2);
+  backdrop-filter: blur(10px);
+}
+
+index.scss in base
+@forward "settings";
+@forward "reset";
+@forward "generics";
+@forward "layout";
+
+index.scss in components
+@forward "settings";
+@forward "reset";
+@forward "generics";
+@forward "layout";
+
+main.scss
+@use "base/index" as base;
+@use "components/index" as components;
+
+LoginDialog.jsx
+import { registrationDialogId } from "../vars.js";
+import LoginForm from "./LoginForm.jsx";
+export default function LoginDialog() {
+  return (
+    <dialog id={registrationDialogId} closedby="any">
+      <div>
+        <button
+          type="button"
+          commandfor={registrationDialogId}
+          command="close"
+        >
+          ×
+        </button>
+      </div>
+
+      <LoginForm/>
+    </dialog>
+  );
+}
+
+LoginForm.jsx
+// LoginOrSignupForm.jsx
+import { useState } from "react";
+import { auth } from "../firebase.js";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+
+export default function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordRepeat, setPasswordRepeat] = useState("");
+  const [name, setName] = useState("");
+  const [mode, setMode] = useState("signin"); // "signin" or "signup"
+  const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError("");
+    setInfo("");
+
+    if (mode === "signup") {
+      // Signup mode: validate extra fields
+      if (!name.trim()) {
+        setError("Bitte gib einen Namen ein.");
+        return;
+      }
+      if (password !== passwordRepeat) {
+        setError("Die Passwörter stimmen nicht überein.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const userCred = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        await updateProfile(userCred.user, { displayName: name.trim() });
+        console.log("User created:", userCred.user);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Fehler bei der Registrierung.");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // mode === "signin"
+    setLoading(true);
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Signed in:", userCred.user);
+    } catch (err) {
+      console.error(err);
+
+      // No matter what the error code is, treat it as "no valid account yet"
+      setMode("signup");
+      setInfo(
+        "Unter dieser E-Mail konntest du nicht angemeldet werden. Bitte vervollständige deine Registrierung."
+      );
+
+      // Optional: show error details if you want, or just ignore
+      // setError("Anmeldung ist fehlgeschlagen. Bitte erstelle ein Konto.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>{mode === "signin" ? "Anmelden" : "Konto erstellen"}</h2>
+
+      <label>
+        E-Mail
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+      </label>
+
+      <label>
+        Passwort
+        <input
+          type="password"
+          required
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+      </label>
+
+      {mode === "signup" && (
+        <>
+          <label>
+            Passwort wiederholen
+            <input
+              type="password"
+              required
+              value={passwordRepeat}
+              onChange={e => setPasswordRepeat(e.target.value)}
+            />
+          </label>
+
+          <label>
+            Wie sollen wir dich nennen?
+            <input
+              type="text"
+              placeholder="Dein Name"
+              required
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+          </label>
+        </>
+      )}
+
+      {info && <p style={{ color: "blue" }}>{info}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <button type="submit" disabled={loading}>
+        {loading
+          ? "Bitte warten..."
+          : mode === "signin"
+            ? "Anmelden"
+            : "Konto erstellen"}
+      </button>
+    </form>
+  );
+}
+
+App.jsx
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import LoginDialog from "./components/LoginDialog.jsx";
+
+export default function App() {
+
+  return (
+    <>
+      <Header/>
+      <main>
+        <section>
+          <h1>Sprich wie ein Einheimischer.</h1>
+          <p>
+            Spanisch, Italienisch oder Japanisch — lerne aus dem Deutschen in
+            nur 15 Minuten täglich.
+          </p>
+        </section>
+
+        <section>
+          <h2>Welche Sprache wartet auf dich?</h2>
+
+          <div className="cards">
+            <article>
+              <h3>🇪🇸 Spanisch</h3>
+              <p>Lerne die Grundlagen für deine nächste Reise.</p>
+            </article>
+
+            <article>
+              <h3>🇮🇹 Italienisch</h3>
+              <p>Von deinem ersten Ciao bis zum Gespräch im Café.</p>
+            </article>
+
+            <article>
+              <h3>🇯🇵 Japanisch</h3>
+              <p>Entdecke neue Wörter, Schriftzeichen und Kultur.</p>
+            </article>
+          </div>
+        </section>
+
+        <section>
+          <h2>Was möchtest du heute üben?</h2>
+
+          <div className="cards">
+            <article>
+              <h3>🍯 Vokabeln</h3>
+              <p>Wiederhole bekannte Wörter und lerne neue dazu.</p>
+            </article>
+
+            <article>
+              <h3>🌸 Übersetzung</h3>
+              <p>Übersetze kurze Sätze in deine Zielsprache.</p>
+            </article>
+
+            <article>
+              <h3>🌻 Lückentext</h3>
+              <p>Ergänze fehlende Wörter und übe im Kontext.</p>
+            </article>
+          </div>
+        </section>
+
+        <section>
+          <h2>Mit kleinen Schritten zum Ziel</h2>
+          <p>
+            Eine kurze Lektion am Morgen, ein paar neue Wörter in der
+            Mittagspause: Du bestimmst, wann und wie du lernst.
+          </p>
+        </section>
+
+        <section>
+          <h2>Deine Reise beginnt heute.</h2>
+          <p>Erstelle dein Konto und starte direkt mit der ersten Lektion.</p>
+        </section>
+      </main>
+
+      <Footer />
+
+      <LoginDialog/>
+    </>
+  );
+}
+
+vars.js
+export const registrationDialogId = "registration-dialog" + crypto.randomUUID();
