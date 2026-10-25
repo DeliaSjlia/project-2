@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import beeLogo from "../assets/images/bee.svg";
+import { auth } from "../firebase.js";
 import { registrationDialogId } from "../vars";
 
 export default function Header() {
+  const [user, setUser] = useState(null);
+
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
+
+  return unsubscribe;
+}, []);
+
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
 
@@ -44,14 +56,31 @@ export default function Header() {
           <span aria-hidden="true">{theme === "light" ? "🌙" : "☀️"}</span>
         </button>
 
-        <button
-          type="button"
-          commandFor={registrationDialogId}
-          command="show-modal"
-          className="btn-primary"
-        >
-          Anmelden
-        </button>
+        {user ? (
+  <>
+    <span className="user-info">
+      <span aria-hidden="true">👤 </span>
+      <span>{user.displayName || user.email}</span>
+    </span>
+
+    <button
+      type="button"
+      className="btn-primary"
+      onClick={() => signOut(auth)}
+    >
+      Abmelden
+    </button>
+  </>
+) : (
+  <button
+    type="button"
+    commandFor={registrationDialogId}
+    command="show-modal"
+    className="btn-primary"
+  >
+    Anmelden
+  </button>
+)}
       </nav>
     </header>
   );

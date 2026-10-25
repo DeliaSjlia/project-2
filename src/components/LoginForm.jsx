@@ -56,16 +56,11 @@ export default function LoginForm() {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       console.log("Signed in:", userCred.user);
     } catch (err) {
-      console.error(err);
+       console.error(err);
 
-      // No matter what the error code is, treat it as "no valid account yet"
-      setMode("signup");
-      setInfo(
-        "Unter dieser E-Mail konntest du nicht angemeldet werden. Bitte vervollständige deine Registrierung.",
+      setError(
+        "Anmeldung fehlgeschlagen. Bitte überprüfe deine E-Mail und dein Passwort.",
       );
-
-      // Optional: show error details if you want, or just ignore
-      // setError("Anmeldung ist fehlgeschlagen. Bitte erstelle ein Konto.");
     } finally {
       setLoading(false);
     }
@@ -129,6 +124,20 @@ export default function LoginForm() {
           : mode === "signin"
             ? "Anmelden"
             : "Konto erstellen"}
+      </button>
+
+      <button
+        type="button"
+        className="btn-text"
+        onClick={() => {
+          setMode(mode === "signin" ? "signup" : "signin");
+          setError("");
+          setInfo("");
+        }}
+      >
+        {mode === "signin"
+          ? "Noch kein Konto? Konto erstellen"
+          : "Bereits registriert? Anmelden"}
       </button>
     </form>
   );
