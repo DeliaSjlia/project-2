@@ -1,0 +1,40 @@
+body {
+  font-family: var(--font);
+  line-height: 1.5;
+  color: var(--c-text);
+  background: var(--c-bg);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--c-heading);
+}
+
+a {
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--c-text-hover);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 4px;
+}
+
+::backdrop {
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}

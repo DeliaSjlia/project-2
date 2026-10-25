@@ -1,0 +1,40 @@
+footer {
+  padding: 14px var(--page-padding);
+}
+
+footer > div {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+footer nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+}
+
+footer {
+  border-top: 1px solid var(--c-border);
+}
+
+footer > div {
+  justify-content: space-between;
+}
+
+footer > div > a {
+  color: var(--c-heading);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+footer > div > a:hover {
+  color: var(--c-text-hover);
+}
+
+footer p {
+  font-size: 12px;
+  color: var(--c-muted);
+}

@@ -1,0 +1,13 @@
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 48px 24px;
+  flex: 1;
+}
