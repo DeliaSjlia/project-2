@@ -2,21 +2,38 @@ import { useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LoginDialog from "./components/LoginDialog.jsx";
+
 import VocabularyExercise from "./components/VocabularyExercise";
+import TranslationExercise from "./components/TranslationExercise";
+import FindMissingWordExercise from "./components/FindMissingWordExercise";
+
 import { mockVocabulary } from "./data/mockVocabulary";
+import { mockTranslations } from "./data/mockTranslations";
+import { mockFindMissingWordExercise } from "./data/mockFindMissingWordExercise";
 
 export default function App() {
-  const [showVocabulary, setShowVocabulary] = useState(false);
+  const [activeExercise, setActiveExercise] = useState(null);
+
+  function closeExercise() {
+    setActiveExercise(null);
+  }
 
   return (
     <>
       <Header />
 
       <main>
-        {showVocabulary ? (
-          <VocabularyExercise
-            words={mockVocabulary}
-            onClose={() => setShowVocabulary(false)}
+        {activeExercise === "vocabulary" ? (
+          <VocabularyExercise words={mockVocabulary} onClose={closeExercise} />
+        ) : activeExercise === "translation" ? (
+          <TranslationExercise
+            exercises={mockTranslations}
+            onClose={closeExercise}
+          />
+        ) : activeExercise === "missingWord" ? (
+          <FindMissingWordExercise
+            exercises={mockFindMissingWordExercise}
+            onClose={closeExercise}
           />
         ) : (
           <>
@@ -57,7 +74,10 @@ export default function App() {
                   <h3>🍯 Vokabeln</h3>
                   <p>Wiederhole bekannte Wörter und lerne neue dazu.</p>
 
-                  <button type="button" onClick={() => setShowVocabulary(true)}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveExercise("vocabulary")}
+                  >
                     Vokabeln üben
                   </button>
                 </article>
@@ -65,11 +85,25 @@ export default function App() {
                 <article>
                   <h3>🌸 Übersetzung</h3>
                   <p>Übersetze kurze Sätze in deine Zielsprache.</p>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveExercise("translation")}
+                  >
+                    Übersetzung üben
+                  </button>
                 </article>
 
                 <article>
                   <h3>🌻 Lückentext</h3>
                   <p>Ergänze fehlende Wörter und übe im Kontext.</p>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveExercise("missingWord")}
+                  >
+                    Lückentext üben
+                  </button>
                 </article>
               </div>
             </section>
