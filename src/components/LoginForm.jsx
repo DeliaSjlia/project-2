@@ -1,89 +1,32 @@
-import { useState } from "react";
-import { auth } from "../firebase.js";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { useLoginForm } from "../hooks/useLoginForm.js";
 import { registrationDialogId } from "../vars.js";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordRepeat, setPasswordRepeat] = useState("");
-  const [name, setName] = useState("");
-  const [mode, setMode] = useState("signin"); // "signin" or "signup"
-  const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  function getAuthErrorMessage(error) {
-    switch (error.code) {
-      case "auth/invalid-credential":
-        return "E-Mail-Adresse oder Passwort ist falsch.";
-      case "auth/invalid-email":
-        return "Bitte gib eine gültige E-Mail-Adresse ein.";
-      case "auth/user-disabled":
-        return "Dieses Konto wurde deaktiviert.";
-      case "auth/too-many-requests":
-        return "Zu viele Versuche. Bitte versuche es später erneut.";
-      case "auth/network-request-failed":
-        return "Netzwerkfehler. Bitte versuche es erneut.";
-      default:
-        return "Anmeldung fehlgeschlagen. Bitte versuche es erneut.";
-    }
-  }
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    passwordRepeat,
+    setPasswordRepeat,
+    name,
+    setName,
+    mode,
+    error,
+    loading,
+    submit,
+    toggleMode,
+  } = useLoginForm();
 
   async function handleSubmit(event) {
-    event.preventDefault();
-    setError("");
-    setInfo("");
+    const successful = await submit(event);
 
-    if (mode === "signup") {
-      // Signup mode: validate extra fields
-      if (!name.trim()) {
-        setError("Bitte gib einen Namen ein.");
-        return;
-      }
-      if (password !== passwordRepeat) {
-        setError("Die Passwörter stimmen nicht überein.");
-        return;
-      }
+    if (!successful) return;
 
-      setLoading(true);
-      try {
-        const userCred = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password,
-        );
-        await updateProfile(userCred.user, { displayName: name.trim() });
-        console.log("User created:", userCred.user);
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Fehler bei der Registrierung.");
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
+    const dialog = document.getElementById(registrationDialogId);
 
-    // mode === "signin"
-    setLoading(true);
-    try {
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Signed in:", userCred.user);
-
-      const dialog = document.getElementById(registrationDialogId);
-      if (dialog?.open) {
-        dialog.close();
-      }
-    } catch (err) {
-      console.error(err);
-
-      setError(getAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
+    if (dialog?.open) {
+      dialog.close();
     }
   }
 
@@ -136,7 +79,6 @@ export default function LoginForm() {
         </>
       )}
 
-      {info && <p style={{ color: "blue" }}>{info}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <button type="submit" disabled={loading}>
@@ -147,15 +89,7 @@ export default function LoginForm() {
             : "Konto erstellen"}
       </button>
 
-      <button
-        type="button"
-        className="btn-text"
-        onClick={() => {
-          setMode(mode === "signin" ? "signup" : "signin");
-          setError("");
-          setInfo("");
-        }}
-      >
+      <button type="button" className="btn-text" onClick={toggleMode}>
         {mode === "signin"
           ? "Noch kein Konto? Konto erstellen"
           : "Bereits registriert? Anmelden"}
