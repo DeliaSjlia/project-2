@@ -1,95 +1,52 @@
 import { useState } from "react";
+import useExerciseRound from "../hooks/useExerciseRound";
+import ExerciseFrame from "./exercises/ExerciseFrame";
+import ExerciseSelection from "./exercises/ExerciseSelection";
+import { mockLearningGroups } from "../data/mockLearningGroups";
 
-export default function VocabularyExercise({ words = [], onClose }) {
-  const [answers, setAnswers] = useState([]);
+function VocabularyCard({ word, onAnswer }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const currentIndex = answers.length;
-  const currentWord = words[currentIndex];
-  const isComplete = currentIndex >= words.length;
-  const knownCount = answers.filter((answer) => answer.known).length;
+  return (
+    <>
+      <p>{isFlipped ? "Übersetzung" : "Tippe auf die Karte, um die Übersetzung zu sehen."}</p>
+      <button type="button" onClick={() => setIsFlipped((previous) => !previous)}>
+        <span lang={isFlipped ? word.targetLanguage : word.sourceLanguage}>
+          {isFlipped ? word.targetText : word.sourceText}
+        </span>
+      </button>
+      {isFlipped && (
+        <div>
+          <button type="button" onClick={() => onAnswer(false)}>Nicht gewusst</button>
+          <button type="button" onClick={() => onAnswer(true)}>Gewusst ✓</button>
+        </div>
+      )}
+    </>
+  );
+}
 
-  function handleAnswer(known) {
-    if (!currentWord || !isFlipped) return;
-
-    setAnswers((previous) => [...previous, { wordId: currentWord.id, known }]);
-    setIsFlipped(false);
-  }
-
-  function handleRestart() {
-    setAnswers([]);
-    setIsFlipped(false);
-  }
+function VocabularyRound({ words, onClose, onRoundComplete }) {
+  const round = useExerciseRound(words, { exerciseType: "vocabulary", onRoundComplete });
 
   return (
-    <section aria-label="Vokabelübung">
-      <button type="button" onClick={onClose}>
-        ← Zurück
-      </button>
-
-      <h2>Vokabeln üben</h2>
-
-      {words.length === 0 ? (
-        <p>Es sind noch keine Vokabeln vorhanden.</p>
-      ) : isComplete ? (
-        <>
-          <h3>Übung abgeschlossen!</h3>
-
-          <p>
-            Du hast {knownCount} von {words.length} Vokabeln gewusst.
-          </p>
-
-          <button type="button" onClick={handleRestart}>
-            Noch einmal üben
-          </button>
-        </>
-      ) : (
-        <>
-          <p>
-            Karte {currentIndex + 1} von {words.length}
-          </p>
-
-          <progress value={currentIndex} max={words.length}>
-            {currentIndex} von {words.length} beantwortet
-          </progress>
-
-          <p>
-            {isFlipped
-              ? "Übersetzung"
-              : "Tippe auf die Karte, um die Übersetzung zu sehen."}
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setIsFlipped((previous) => !previous)}
-            aria-label={
-              isFlipped ? "Deutsches Wort anzeigen" : "Übersetzung anzeigen"
-            }
-          >
-            <span
-              lang={
-                isFlipped
-                  ? currentWord.targetLanguage
-                  : currentWord.sourceLanguage
-              }
-            >
-              {isFlipped ? currentWord.targetText : currentWord.sourceText}
-            </span>
-          </button>
-
-          {isFlipped && (
-            <div>
-              <button type="button" onClick={() => handleAnswer(false)}>
-                Nicht gewusst
-              </button>
-
-              <button type="button" onClick={() => handleAnswer(true)}>
-                Gewusst ✓
-              </button>
-            </div>
-          )}
-        </>
+    <ExerciseFrame title="Vokabeln üben" round={round} onClose={onClose} vocabulary>
+      {round.currentItem && (
+        <VocabularyCard
+          key={`${round.roundNumber}:${round.currentIndex}`}
+          word={round.currentItem}
+          onAnswer={round.answerAndNext}
+        />
       )}
-    </section>
+    </ExerciseFrame>
+  );
+}
+
+export default function VocabularyExercise({ words = [], groups = mockLearningGroups, onClose, onRoundComplete }) {
+  return (
+    <ExerciseSelection title="Vokabeln üben" items={words} groups={groups} onClose={onClose}>
+      {(selectedItems, backToSelection) => (
+        <VocabularyRound words={selectedItems} onClose={backToSelection} onRoundComplete={onRoundComplete} />
+      )}
+    </ExerciseSelection>
   );
 }
