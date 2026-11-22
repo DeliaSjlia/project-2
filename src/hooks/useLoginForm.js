@@ -1,22 +1,9 @@
 import { useState } from "react";
-import { register, signIn } from "../services/authService.js";
-
-export function getAuthErrorMessage(error) {
-  switch (error.code) {
-    case "auth/invalid-credential":
-      return "E-Mail-Adresse oder Passwort ist falsch.";
-    case "auth/invalid-email":
-      return "Bitte gib eine gültige E-Mail-Adresse ein.";
-    case "auth/user-disabled":
-      return "Dieses Konto wurde deaktiviert.";
-    case "auth/too-many-requests":
-      return "Zu viele Versuche. Bitte versuche es später erneut.";
-    case "auth/network-request-failed":
-      return "Netzwerkfehler. Bitte versuche es erneut.";
-    default:
-      return "Authentifizierung fehlgeschlagen.";
-  }
-}
+import {
+  register,
+  signIn,
+  getAuthErrorMessage,
+} from "../services/authService.js";
 
 export function useLoginForm() {
   const [email, setEmail] = useState("");
