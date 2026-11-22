@@ -1,0 +1,17 @@
+export const mockVocabulary = [
+  { id: "es-001", groupId: "es-beginner-greetings", sourceText: "Guten Morgen", targetText: "Buenos días", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-002", groupId: "es-beginner-greetings", sourceText: "Danke", targetText: "Gracias", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-003", groupId: "es-beginner-greetings", sourceText: "Bitte (bei einer Bitte)", targetText: "Por favor", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-004", groupId: "es-beginner-greetings", sourceText: "Auf Wiedersehen", targetText: "Adiós", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-005", groupId: "es-beginner-greetings", sourceText: "Wie geht es dir?", targetText: "¿Cómo estás?", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-006", groupId: "es-beginner-food", sourceText: "das Wasser", targetText: "el agua", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-007", groupId: "es-beginner-food", sourceText: "das Brot", targetText: "el pan", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-008", groupId: "es-medium-travel", sourceText: "die Fahrkarte", targetText: "el billete", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-009", groupId: "es-medium-travel", sourceText: "die Reservierung", targetText: "la reserva", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-010", groupId: "es-medium-routine", sourceText: "aufstehen", targetText: "levantarse", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-011", groupId: "es-medium-routine", sourceText: "sich ausruhen", targetText: "descansar", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-012", groupId: "es-hard-opinions", sourceText: "jedoch", targetText: "sin embargo", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-013", groupId: "es-hard-opinions", sourceText: "trotz", targetText: "a pesar de", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-014", groupId: "es-hard-hypotheticals", sourceText: "vorausgesetzt, dass", targetText: "siempre que", sourceLanguage: "de", targetLanguage: "es" },
+  { id: "es-015", groupId: "es-hard-hypotheticals", sourceText: "hoffentlich", targetText: "ojalá", sourceLanguage: "de", targetLanguage: "es" },
+];
