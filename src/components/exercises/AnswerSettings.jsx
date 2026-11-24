@@ -1,4 +1,4 @@
-export default function AnswerSettings({ ignoreAccents, onChange, disabled }) {
+export default function AnswerSettings({ ignoreAccents, onChange, disabled, targetLanguage = "es" }) {
   return (
     <p>
       <label>
@@ -8,7 +8,9 @@ export default function AnswerSettings({ ignoreAccents, onChange, disabled }) {
           onChange={(event) => onChange(event.target.checked)}
           disabled={disabled}
         />
-        Akzente ignorieren (z. B. dias statt días; ñ bleibt erforderlich)
+        {targetLanguage === "it"
+          ? "Akzente ignorieren (z. B. caffe statt caffè)"
+          : "Akzente ignorieren (z. B. dias statt días; ñ bleibt erforderlich)"}
       </label>
     </p>
   );

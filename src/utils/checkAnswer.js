@@ -1,7 +1,8 @@
-function normalizeAnswer(value, ignoreAccents) {
-  let normalized = value.normalize("NFC").toLocaleLowerCase("es");
+function normalizeAnswer(value, ignoreAccents, targetLanguage) {
+  let normalized = value.normalize(targetLanguage === "ja" ? "NFKC" : "NFC")
+    .toLocaleLowerCase(targetLanguage);
 
-  if (ignoreAccents) {
+  if (ignoreAccents && targetLanguage !== "ja") {
     // Ignore vowel accents/diacritics, but preserve Spanish ñ.
     normalized = normalized
       .replace(/[áàâäãå]/g, "a")
@@ -11,15 +12,26 @@ function normalizeAnswer(value, ignoreAccents) {
       .replace(/[úùûü]/g, "u");
   }
 
-  return normalized
-    .replace(/[¿?¡!.,;:]/g, "")
+  normalized = normalized
+    .replace(/[¿?¡!.,;:。、！？]/g, "")
     .trim()
     .replace(/\s+/g, " ");
+
+  // Japanese and its Romaji readings do not require a fixed word-spacing style.
+  return targetLanguage === "ja" ? normalized.replace(/\s/g, "") : normalized;
 }
 
-export function checkAnswer(answer, acceptedAnswers, { ignoreAccents = true } = {}) {
-  const normalized = normalizeAnswer(answer, ignoreAccents);
+export function checkAnswer(answer, acceptedAnswers, { ignoreAccents = true, targetLanguage = "es" } = {}) {
+  const normalized = normalizeAnswer(answer, ignoreAccents, targetLanguage);
   return Boolean(normalized) && acceptedAnswers.some(
-    (accepted) => normalizeAnswer(accepted, ignoreAccents) === normalized,
+    (accepted) => normalizeAnswer(accepted, ignoreAccents, targetLanguage) === normalized,
   );
+}
+
+export function checkExerciseAnswer(answer, exercise, options = {}) {
+  const targetLanguage = options.targetLanguage ?? exercise.targetLanguage ?? "es";
+  const acceptedAnswers = targetLanguage === "ja"
+    ? [...exercise.acceptedAnswers, ...(exercise.acceptedRomaji ?? [])]
+    : exercise.acceptedAnswers;
+  return checkAnswer(answer, acceptedAnswers, { ...options, targetLanguage });
 }

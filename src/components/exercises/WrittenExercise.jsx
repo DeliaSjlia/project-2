@@ -1,20 +1,26 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import useExerciseRound from "../../hooks/useExerciseRound";
-import { checkAnswer } from "../../utils/checkAnswer";
+import { checkExerciseAnswer } from "../../utils/checkAnswer";
 import ExerciseFrame from "./ExerciseFrame";
 import AnswerSettings from "./AnswerSettings";
+import JapaneseReading from "./JapaneseReading";
 
-function WrittenQuestion({ item, result, ignoreAccents, recordAnswer, next, isLast, renderPrompt }) {
+function defaultSolutionText(item) {
+  return item.acceptedAnswers[0];
+}
+
+function WrittenQuestion({ item, result, ignoreAccents, targetLanguage, showHiragana, recordAnswer, next, isLast, renderPrompt, getSolutionText }) {
   const [answer, setAnswer] = useState("");
   const inputId = useId();
   const hintId = useId();
+  const composing = useRef(false);
   const checked = result !== null;
 
   function handleCheck(event) {
     event.preventDefault();
-    if (!answer.trim() || checked) return;
-    const correct = checkAnswer(answer, item.acceptedAnswers, { ignoreAccents });
-    recordAnswer(correct, answer.trim(), { ignoreAccents });
+    if (!answer.trim() || checked || composing.current) return;
+    const correct = checkExerciseAnswer(answer, item, { ignoreAccents, targetLanguage });
+    recordAnswer(correct, answer.trim(), { ignoreAccents: targetLanguage !== "ja" && ignoreAccents, targetLanguage });
   }
 
   const input = (
@@ -22,10 +28,17 @@ function WrittenQuestion({ item, result, ignoreAccents, recordAnswer, next, isLa
       id={inputId}
       name="answer"
       type="text"
-      lang="es"
+      lang={targetLanguage}
       aria-describedby={item.hint ? hintId : undefined}
       value={answer}
       onChange={(event) => setAnswer(event.target.value)}
+      onCompositionStart={() => { composing.current = true; }}
+      onCompositionEnd={() => { composing.current = false; }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && (composing.current || event.nativeEvent.isComposing || event.keyCode === 229)) {
+          event.preventDefault();
+        }
+      }}
       readOnly={checked}
       autoComplete="off"
       autoCapitalize="none"
@@ -37,14 +50,19 @@ function WrittenQuestion({ item, result, ignoreAccents, recordAnswer, next, isLa
   return (
     <>
       <form onSubmit={handleCheck}>
-        {renderPrompt({ item, input, inputId, hintId })}
+        {renderPrompt({ item, input, inputId, hintId, targetLanguage, showHiragana })}
         <button type="submit" disabled={!answer.trim() || checked}>Prüfen</button>
       </form>
       <div role="status">
         {checked && (
           <>
             <p>{result.correct ? "Richtig! ✓" : "Noch nicht richtig."}</p>
-            <p>Richtige Schreibweise: <span lang="es">{item.acceptedAnswers[0]}</span></p>
+            <p>Richtige Schreibweise: <span lang={targetLanguage}>{getSolutionText(item)}</span></p>
+            <JapaneseReading
+              text={getSolutionText(item)}
+              reading={item.hiragana}
+              visible={targetLanguage === "ja" && showHiragana}
+            />
           </>
         )}
       </div>
@@ -57,28 +75,34 @@ function WrittenQuestion({ item, result, ignoreAccents, recordAnswer, next, isLa
   );
 }
 
-export default function WrittenExercise({ exercises, title, exerciseType, onClose, onRoundComplete, renderPrompt }) {
-  const round = useExerciseRound(exercises, { exerciseType, onRoundComplete });
+export default function WrittenExercise({ exercises, title, exerciseType, targetLanguage = "es", showHiragana = false, onClose, onRoundComplete, renderPrompt, getSolutionText = defaultSolutionText }) {
+  const round = useExerciseRound(exercises, { exerciseType, targetLanguage, onRoundComplete });
   const [ignoreAccents, setIgnoreAccents] = useState(true);
 
   return (
     <ExerciseFrame title={title} round={round} onClose={onClose}>
       {round.currentItem && (
         <>
-          <AnswerSettings
-            ignoreAccents={ignoreAccents}
-            onChange={setIgnoreAccents}
-            disabled={round.currentResult !== null}
-          />
+          {targetLanguage !== "ja" && (
+            <AnswerSettings
+              ignoreAccents={ignoreAccents}
+              onChange={setIgnoreAccents}
+              disabled={round.currentResult !== null}
+              targetLanguage={targetLanguage}
+            />
+          )}
           <WrittenQuestion
             key={`${round.roundNumber}:${round.currentIndex}`}
             item={round.currentItem}
             result={round.currentResult}
             ignoreAccents={ignoreAccents}
+            targetLanguage={targetLanguage}
+            showHiragana={showHiragana}
             recordAnswer={round.recordAnswer}
             next={round.next}
             isLast={round.currentIndex === round.total - 1}
             renderPrompt={renderPrompt}
+            getSolutionText={getSolutionText}
           />
         </>
       )}

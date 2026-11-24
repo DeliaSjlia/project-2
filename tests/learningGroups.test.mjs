@@ -5,19 +5,22 @@ import { createRound, exerciseRoundReducer as reduce, getMistakes } from '../src
 import { mockLearningGroups as groups } from '../src/data/mockLearningGroups.js';
 import { mockVocabulary } from '../src/data/mockVocabulary.js';
 import { mockTranslations } from '../src/data/mockTranslations.js';
-import { mockFindMissingWordExercise } from '../src/data/mockFindMissingWordExercise.js';
+import { mockExerciseContent } from '../src/data/mockExerciseContent.js';
 
 test('every mock item has a unique ID and belongs to a valid group', () => {
-  for (const items of [mockVocabulary, mockTranslations, mockFindMissingWordExercise]) {
-    assert.equal(new Set(items.map(item => item.id)).size, items.length);
-    for (const item of items) {
-      assert.ok(groups.some(group => group.id === item.groupId));
-      if (item.acceptedAnswers) assert.ok(item.acceptedAnswers.length > 0);
-    }
-    const available = getAvailableGroups(items, groups);
-    assert.equal(available.length, 6);
-    for (const difficulty of ['beginner', 'medium', 'hard']) {
-      assert.equal(available.filter(group => group.difficulty === difficulty).length, 2);
+  for (const [language, content] of Object.entries(mockExerciseContent)) {
+    for (const items of [content.vocabulary, content.translations, content.missingWords]) {
+      assert.equal(new Set(items.map(item => item.id)).size, items.length);
+      for (const item of items) {
+        assert.ok(groups.some(group => group.id === item.groupId));
+        if (item.acceptedAnswers) assert.ok(item.acceptedAnswers.length > 0);
+      }
+      const available = getAvailableGroups(items, groups, language);
+      assert.ok(available.length > 0);
+      assert.ok(available.every(group => group.targetLanguage === language));
+      for (const difficulty of ['beginner', 'medium', 'hard']) {
+        assert.ok(available.some(group => group.difficulty === difficulty));
+      }
     }
   }
 });

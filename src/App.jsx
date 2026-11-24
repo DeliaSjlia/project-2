@@ -2,17 +2,18 @@ import { useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LoginDialog from "./components/LoginDialog.jsx";
+import LanguagePicker from "./components/LanguagePicker";
 
 import VocabularyExercise from "./components/VocabularyExercise";
 import TranslationExercise from "./components/TranslationExercise";
 import FindMissingWordExercise from "./components/FindMissingWordExercise";
 
-import { mockVocabulary } from "./data/mockVocabulary";
-import { mockTranslations } from "./data/mockTranslations";
-import { mockFindMissingWordExercise } from "./data/mockFindMissingWordExercise";
+import { mockExerciseContent } from "./data/mockExerciseContent";
 
 export default function App() {
   const [activeExercise, setActiveExercise] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("es");
+  const content = mockExerciseContent[selectedLanguage];
 
   function closeExercise() {
     setActiveExercise(null);
@@ -24,15 +25,27 @@ export default function App() {
 
       <main>
         {activeExercise === "vocabulary" ? (
-          <VocabularyExercise words={mockVocabulary} onClose={closeExercise} />
+          <VocabularyExercise
+            key={selectedLanguage}
+            words={content.vocabulary}
+            groups={content.groups}
+            targetLanguage={selectedLanguage}
+            onClose={closeExercise}
+          />
         ) : activeExercise === "translation" ? (
           <TranslationExercise
-            exercises={mockTranslations}
+            key={selectedLanguage}
+            exercises={content.translations}
+            groups={content.groups}
+            targetLanguage={selectedLanguage}
             onClose={closeExercise}
           />
         ) : activeExercise === "missingWord" ? (
           <FindMissingWordExercise
-            exercises={mockFindMissingWordExercise}
+            key={selectedLanguage}
+            exercises={content.missingWords}
+            groups={content.groups}
+            targetLanguage={selectedLanguage}
             onClose={closeExercise}
           />
         ) : (
@@ -48,22 +61,7 @@ export default function App() {
             <section>
               <h2>Welche Sprache wartet auf dich?</h2>
 
-              <div className="cards">
-                <article>
-                  <h3>🇪🇸 Spanisch</h3>
-                  <p>Lerne die Grundlagen für deine nächste Reise.</p>
-                </article>
-
-                <article>
-                  <h3>🇮🇹 Italienisch</h3>
-                  <p>Von deinem ersten Ciao bis zum Gespräch im Café.</p>
-                </article>
-
-                <article>
-                  <h3>🇯🇵 Japanisch</h3>
-                  <p>Entdecke neue Wörter, Schriftzeichen und Kultur.</p>
-                </article>
-              </div>
+              <LanguagePicker value={selectedLanguage} onChange={setSelectedLanguage} />
             </section>
 
             <section>
