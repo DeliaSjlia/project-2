@@ -1,9 +1,10 @@
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { createRound, exerciseRoundReducer, getMistakes } from "../utils/exerciseRound";
 
-export default function useExerciseRound(items, { exerciseType, onRoundComplete } = {}) {
+export default function useExerciseRound(items, { exerciseType, targetLanguage = "es", onRoundComplete } = {}) {
   const [state, dispatch] = useReducer(exerciseRoundReducer, items, createRound);
   const notifiedRound = useRef(null);
+  const [sessionId] = useState(() => crypto.randomUUID());
   const total = state.items.length;
   const isComplete = total > 0 && state.currentIndex >= total;
   const score = state.results.filter((result) => result.correct).length;
@@ -12,14 +13,17 @@ export default function useExerciseRound(items, { exerciseType, onRoundComplete 
     if (!isComplete || !onRoundComplete || notifiedRound.current === state.roundNumber) return;
     notifiedRound.current = state.roundNumber;
     onRoundComplete({
+      completionId: `${sessionId}-${state.roundNumber}`,
+      completedAt: new Date().toISOString(),
       exerciseType,
+      targetLanguage,
       roundNumber: state.roundNumber,
       mode: state.mode,
       total,
       score,
       results: state.results,
     });
-  }, [isComplete, onRoundComplete, exerciseType, state.roundNumber, state.mode, state.results, total, score]);
+  }, [isComplete, onRoundComplete, exerciseType, targetLanguage, sessionId, state.roundNumber, state.mode, state.results, total, score]);
 
   return {
     currentItem: state.items[state.currentIndex],
