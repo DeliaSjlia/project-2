@@ -27,21 +27,5 @@ service cloud.firestore {
         && request.resource.data.savedAt == request.time;
       // Completed rounds are immutable. Retries read the existing document instead of updating it.
     }
-
-    match /users/{userId}/connectionTests/{testId} {
-      function ownsTestDocument() {
-        return request.auth != null
-          && request.auth.uid == userId
-          && testId == 'firestore-check';
-      }
-
-      allow get: if ownsTestDocument();
-      allow create, update: if ownsTestDocument()
-        && request.resource.data.keys().hasAll(['message', 'writtenAt'])
-        && request.resource.data.keys().hasOnly(['message', 'writtenAt'])
-        && request.resource.data.message == 'VocaBee Firestore connection test'
-        && request.resource.data.writtenAt is timestamp
-        && request.resource.data.writtenAt == request.time;
-    }
   }
 }
