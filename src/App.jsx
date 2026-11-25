@@ -3,6 +3,10 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LoginDialog from "./components/LoginDialog.jsx";
 import LanguagePicker from "./components/LanguagePicker";
+import LearningDashboard from "./components/LearningDashboard";
+import CompletionSaveStatus from "./components/CompletionSaveStatus";
+import { useAuth } from "./hooks/useAuth.js";
+import useCompletionSaver from "./hooks/useCompletionSaver";
 
 import VocabularyExercise from "./components/VocabularyExercise";
 import TranslationExercise from "./components/TranslationExercise";
@@ -14,6 +18,10 @@ export default function App() {
   const [activeExercise, setActiveExercise] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState("es");
   const content = mockExerciseContent[selectedLanguage];
+  const { user, isLoading: authLoading } = useAuth();
+  const userId = user?.uid;
+  const saving = useCompletionSaver(userId);
+  const exerciseKey = `${selectedLanguage}:${userId ?? "guest"}`;
 
   function closeExercise() {
     setActiveExercise(null);
@@ -24,29 +32,34 @@ export default function App() {
       <Header />
 
       <main>
+        <LearningDashboard key={userId ?? "guest"} userId={userId} authLoading={authLoading} />
+        <CompletionSaveStatus attempts={saving.attempts} onRetry={saving.retry} />
         {activeExercise === "vocabulary" ? (
           <VocabularyExercise
-            key={selectedLanguage}
+            key={exerciseKey}
             words={content.vocabulary}
             groups={content.groups}
             targetLanguage={selectedLanguage}
             onClose={closeExercise}
+            onRoundComplete={saving.onRoundComplete}
           />
         ) : activeExercise === "translation" ? (
           <TranslationExercise
-            key={selectedLanguage}
+            key={exerciseKey}
             exercises={content.translations}
             groups={content.groups}
             targetLanguage={selectedLanguage}
             onClose={closeExercise}
+            onRoundComplete={saving.onRoundComplete}
           />
         ) : activeExercise === "missingWord" ? (
           <FindMissingWordExercise
-            key={selectedLanguage}
+            key={exerciseKey}
             exercises={content.missingWords}
             groups={content.groups}
             targetLanguage={selectedLanguage}
             onClose={closeExercise}
+            onRoundComplete={saving.onRoundComplete}
           />
         ) : (
           <>

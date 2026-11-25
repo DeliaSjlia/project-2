@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// Merge these match blocks with any other custom rules already used by your project.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/exerciseCompletions/{completionId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow read: if isOwner();
+      allow create: if isOwner()
+        && completionId.matches('^[a-zA-Z0-9_-]{1,100}$')
+        && request.resource.data.keys().hasAll(['exerciseType', 'targetLanguage', 'mode', 'total', 'score', 'completedAt', 'savedAt'])
+        && request.resource.data.keys().hasOnly(['exerciseType', 'targetLanguage', 'mode', 'total', 'score', 'completedAt', 'savedAt'])
+        && request.resource.data.exerciseType in ['vocabulary', 'translation', 'missingWord']
+        && request.resource.data.targetLanguage in ['es', 'it', 'ja']
+        && request.resource.data.mode in ['all', 'mistakes']
+        && request.resource.data.total is int
+        && request.resource.data.total > 0
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= request.resource.data.total
+        && request.resource.data.completedAt is timestamp
+        && request.resource.data.completedAt <= request.time + duration.value(5, 'm')
+        && request.resource.data.savedAt is timestamp
+        && request.resource.data.savedAt == request.time;
+      // Completed rounds are immutable. Retries read the existing document instead of updating it.
+    }
+
+    match /users/{userId}/connectionTests/{testId} {
+      function ownsTestDocument() {
+        return request.auth != null
+          && request.auth.uid == userId
+          && testId == 'firestore-check';
+      }
+
+      allow get: if ownsTestDocument();
+      allow create, update: if ownsTestDocument()
+        && request.resource.data.keys().hasAll(['message', 'writtenAt'])
+        && request.resource.data.keys().hasOnly(['message', 'writtenAt'])
+        && request.resource.data.message == 'VocaBee Firestore connection test'
+        && request.resource.data.writtenAt is timestamp
+        && request.resource.data.writtenAt == request.time;
+    }
+  }
+}
